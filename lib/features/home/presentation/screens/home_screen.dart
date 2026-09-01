@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/utils/responsive.dart';
@@ -11,6 +12,7 @@ import '../widgets/weather_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final services = ref.watch(servicesProvider);
@@ -39,6 +41,7 @@ class HomeScreen extends ConsumerWidget {
                           'Good Morning 👋',
                           style: AppTextStyles.bodyMedium,
                         ),
+
                         const SizedBox(height: 5),
 
                         const Text(
@@ -140,7 +143,9 @@ class HomeScreen extends ConsumerWidget {
                   ),
 
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.go('/nearby');
+                    },
                     child: const Text('View all'),
                   ),
                 ],
@@ -194,42 +199,62 @@ class _NearbyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            color: Theme.of(context).colorScheme.primary,
-            size: 28,
-          ),
-
-          const Spacer(),
-
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        context.go('/nearby');
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.04),
             ),
-          ),
-
-          const SizedBox(height: 3),
-
-          Text(
-            '$distance away',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 12,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.primary,
+                size: 22,
+              ),
             ),
-          ),
-        ],
+
+            const Spacer(),
+
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+
+            const SizedBox(height: 3),
+
+            Text(
+              '$distance away',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
