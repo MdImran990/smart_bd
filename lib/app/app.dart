@@ -9,7 +9,6 @@ class SmartBDApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // routerProvider-এ auth status change হলে নতুন router তৈরি হয়
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
