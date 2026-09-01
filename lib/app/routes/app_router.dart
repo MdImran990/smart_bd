@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/home/data/models/service_model.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/home/presentation/screens/service_detail_screen.dart';
 import '../../features/nearby/presentation/screens/nearby_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../shell/main_shell.dart';
@@ -23,6 +26,19 @@ class AppRouter {
                 builder: (context, state) {
                   return const HomeScreen();
                 },
+                routes: [
+                  GoRoute(
+                    path: 'service/:id',
+                    builder: (context, state) {
+                      final extra = state.extra as ServiceModel;
+                      return ServiceDetailScreen(
+                        serviceId: extra.id,
+                        title: extra.title,
+                        icon: extra.icon,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

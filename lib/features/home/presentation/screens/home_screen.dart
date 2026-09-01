@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
@@ -120,7 +121,10 @@ class HomeScreen extends ConsumerWidget {
                     icon: service.icon,
                     title: service.title,
                     onTap: () {
-                      debugPrint('Selected: ${service.title}');
+                      context.go(
+                        '/home/service/${service.id}',
+                        extra: service,
+                      );
                     },
                   );
                 },
