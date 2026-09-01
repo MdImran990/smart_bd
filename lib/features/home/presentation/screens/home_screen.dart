@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/theme/app_spacing.dart';
+import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/utils/responsive.dart';
 import '../providers/service_provider.dart';
 import '../widgets/service_button.dart';
 import '../widgets/weather_card.dart';
@@ -9,14 +12,18 @@ class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(
-      BuildContext context,
-      WidgetRef ref,
-      ) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final services = ref.watch(servicesProvider);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+          padding: EdgeInsets.fromLTRB(
+            Responsive.pagePadding(context).horizontal / 2,
+            AppSpacing.xl,
+            Responsive.pagePadding(context).horizontal / 2,
+            100,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -30,30 +37,21 @@ class HomeScreen extends ConsumerWidget {
                       children: [
                         Text(
                           'Good Morning 👋',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
-                          ),
+                          style: AppTextStyles.bodyMedium,
                         ),
 
                         const SizedBox(height: 5),
 
                         const Text(
                           'Imran',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.headingLarge,
                         ),
 
                         const SizedBox(height: 5),
 
                         Text(
                           '📍 Dhaka, Bangladesh',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 13,
-                          ),
+                          style: AppTextStyles.bodyMedium,
                         ),
                       ],
                     ),
@@ -79,12 +77,12 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: AppSpacing.xxl),
 
               // Weather
               const WeatherCard(),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: AppSpacing.xxxl),
 
               // Services Header
               Row(
@@ -92,10 +90,7 @@ class HomeScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     'Quick Services',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.headingMedium,
                   ),
 
                   TextButton(
@@ -105,49 +100,41 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSpacing.md),
 
               // Services
-              Consumer(
-                builder: (context, ref, _) {
-                  final services = ref.watch(servicesProvider);
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: services.length,
-                    gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 1.15,
-                    ),
-                    itemBuilder: (context, index) {
-                      final service = services[index];
-                      return ServiceButton(
-                        icon: service.icon,
-                        title: service.title,
-                        onTap: () {
-                          debugPrint('Selected: ${service.title}');
-                        },
-                      );
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: services.length,
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 1.15,
+                ),
+                itemBuilder: (context, index) {
+                  final service = services[index];
+                  return ServiceButton(
+                    icon: service.icon,
+                    title: service.title,
+                    onTap: () {
+                      debugPrint('Selected: ${service.title}');
                     },
                   );
                 },
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: AppSpacing.xxxl),
 
-              // Nearby
+              // Nearby Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
                     'Nearby Services',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.headingMedium,
                   ),
 
                   TextButton(
@@ -157,7 +144,7 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSpacing.md),
 
               SizedBox(
                 height: 125,
