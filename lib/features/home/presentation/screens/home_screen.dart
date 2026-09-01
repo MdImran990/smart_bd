@@ -11,7 +11,6 @@ import '../widgets/weather_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final services = ref.watch(servicesProvider);
@@ -40,7 +39,6 @@ class HomeScreen extends ConsumerWidget {
                           'Good Morning 👋',
                           style: AppTextStyles.bodyMedium,
                         ),
-
                         const SizedBox(height: 5),
 
                         const Text(
