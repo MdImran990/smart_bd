@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../features/home/presentation/screens/home_screen.dart';
+import 'routes/app_router.dart';
 import 'theme/app_theme.dart';
 
 class SmartBDApp extends StatelessWidget {
@@ -8,13 +8,11 @@ class SmartBDApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Smart BD',
-
       theme: AppTheme.lightTheme,
-
-      home: const HomeScreen(),
+      routerConfig: AppRouter.router,
     );
   }
 }
