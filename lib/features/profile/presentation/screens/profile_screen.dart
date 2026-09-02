@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
-class ProfileScreen extends StatelessWidget {
+import '../../../auth/presentation/providers/auth_provider.dart';
+
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      WidgetRef ref,
+      ) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -52,7 +59,9 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(
+                      height: AppSpacing.md,
+                    ),
 
                     const Text(
                       'Imran Hossain',
@@ -69,31 +78,57 @@ class ProfileScreen extends StatelessWidget {
                       '📍 Dhaka, Bangladesh',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: Colors.white.withValues(
+                          alpha: 0.8,
+                        ),
                       ),
                     ),
 
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(
+                      height: AppSpacing.lg,
+                    ),
 
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment:
+                      MainAxisAlignment.spaceEvenly,
                       children: [
-                        _StatItem(label: 'Saved', value: '12'),
-                        _StatDivider(),
-                        _StatItem(label: 'Visited', value: '48'),
-                        _StatDivider(),
-                        _StatItem(label: 'Reviews', value: '7'),
+                        _StatItem(
+                          label: 'Saved',
+                          value: '12',
+                        ),
+
+                        const _StatDivider(),
+
+                        _StatItem(
+                          label: 'Visited',
+                          value: '48',
+                        ),
+
+                        const _StatDivider(),
+
+                        _StatItem(
+                          label: 'Reviews',
+                          value: '7',
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.xxl),
+              const SizedBox(
+                height: AppSpacing.xxl,
+              ),
 
               // Account Section
-              _SectionTitle(title: 'Account'),
-              const SizedBox(height: AppSpacing.md),
+              const _SectionTitle(
+                title: 'Account',
+              ),
+
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
+
               _SettingsCard(
                 items: [
                   _SettingsItem(
@@ -101,11 +136,13 @@ class ProfileScreen extends StatelessWidget {
                     label: 'Edit Profile',
                     onTap: () {},
                   ),
+
                   _SettingsItem(
                     icon: Icons.location_on_outlined,
                     label: 'My Location',
                     onTap: () {},
                   ),
+
                   _SettingsItem(
                     icon: Icons.notifications_none_rounded,
                     label: 'Notifications',
@@ -114,11 +151,19 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(
+                height: AppSpacing.lg,
+              ),
 
-              // Preferences Section
-              _SectionTitle(title: 'Preferences'),
-              const SizedBox(height: AppSpacing.md),
+              // Preferences
+              const _SectionTitle(
+                title: 'Preferences',
+              ),
+
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
+
               _SettingsCard(
                 items: [
                   _SettingsItem(
@@ -130,6 +175,7 @@ class ProfileScreen extends StatelessWidget {
                       onChanged: (_) {},
                     ),
                   ),
+
                   _SettingsItem(
                     icon: Icons.language_outlined,
                     label: 'Language',
@@ -139,11 +185,19 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(
+                height: AppSpacing.lg,
+              ),
 
-              // Support Section
-              _SectionTitle(title: 'Support'),
-              const SizedBox(height: AppSpacing.md),
+              // Support
+              const _SectionTitle(
+                title: 'Support',
+              ),
+
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
+
               _SettingsCard(
                 items: [
                   _SettingsItem(
@@ -151,11 +205,13 @@ class ProfileScreen extends StatelessWidget {
                     label: 'Help & Support',
                     onTap: () {},
                   ),
+
                   _SettingsItem(
                     icon: Icons.privacy_tip_outlined,
                     label: 'Privacy Policy',
                     onTap: () {},
                   ),
+
                   _SettingsItem(
                     icon: Icons.info_outline_rounded,
                     label: 'About Smart BD',
@@ -164,17 +220,82 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: AppSpacing.xxl),
+              const SizedBox(
+                height: AppSpacing.xxl,
+              ),
 
-              // Logout Button
+              // =========================
+              // LOGOUT BUTTON
+              // =========================
+
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    // Show confirmation dialog
+                    final shouldLogout =
+                    await showDialog<bool>(
+                      context: context,
+                      builder: (dialogContext) {
+                        return AlertDialog(
+                          title: const Text(
+                            'Log Out',
+                          ),
+                          content: const Text(
+                            'Are you sure you want to log out?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(
+                                  dialogContext,
+                                  false,
+                                );
+                              },
+                              child: const Text(
+                                'Cancel',
+                              ),
+                            ),
+
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(
+                                  dialogContext,
+                                  true,
+                                );
+                              },
+                              child: const Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  color: AppColors.error,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (shouldLogout != true) {
+                      return;
+                    }
+
+                    // Logout from Riverpod
+                    await ref
+                        .read(authProvider.notifier)
+                        .logout();
+
+                    // Go to Login Page
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
+
                   icon: const Icon(
                     Icons.logout_rounded,
                     color: AppColors.error,
                   ),
+
                   label: const Text(
                     'Log Out',
                     style: TextStyle(
@@ -182,9 +303,14 @@ class ProfileScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(color: AppColors.error),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                    ),
+                    side: const BorderSide(
+                      color: AppColors.error,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -199,11 +325,18 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
+// =========================
+// STAT ITEM
+// =========================
+
 class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({required this.label, required this.value});
+  const _StatItem({
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -217,12 +350,16 @@ class _StatItem extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+
         const SizedBox(height: 2),
+
         Text(
           label,
           style: TextStyle(
             fontSize: 13,
-            color: Colors.white.withValues(alpha: 0.8),
+            color: Colors.white.withValues(
+              alpha: 0.8,
+            ),
           ),
         ),
       ],
@@ -230,35 +367,58 @@ class _StatItem extends StatelessWidget {
   }
 }
 
+// =========================
+// STAT DIVIDER
+// =========================
+
 class _StatDivider extends StatelessWidget {
+  const _StatDivider();
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 1,
       height: 40,
-      color: Colors.white.withValues(alpha: 0.3),
+      color: Colors.white.withValues(
+        alpha: 0.3,
+      ),
     );
   }
 }
 
+// =========================
+// SECTION TITLE
+// =========================
+
 class _SectionTitle extends StatelessWidget {
   final String title;
 
-  const _SectionTitle({required this.title});
+  const _SectionTitle({
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text(title, style: AppTextStyles.headingMedium),
+      child: Text(
+        title,
+        style: AppTextStyles.headingMedium,
+      ),
     );
   }
 }
 
+// =========================
+// SETTINGS CARD
+// =========================
+
 class _SettingsCard extends StatelessWidget {
   final List<_SettingsItem> items;
 
-  const _SettingsCard({required this.items});
+  const _SettingsCard({
+    required this.items,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -269,19 +429,29 @@ class _SettingsCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             blurRadius: 10,
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(
+              alpha: 0.04,
+            ),
           ),
         ],
       ),
       child: Column(
-        children: items.asMap().entries.map((entry) {
+        children: items
+            .asMap()
+            .entries
+            .map((entry) {
           final index = entry.key;
           final item = entry.value;
+
           return Column(
             children: [
               item,
+
               if (index < items.length - 1)
-                const Divider(height: 1, indent: 56),
+                const Divider(
+                  height: 1,
+                  indent: 56,
+                ),
             ],
           );
         }).toList(),
@@ -289,6 +459,10 @@ class _SettingsCard extends StatelessWidget {
     );
   }
 }
+
+// =========================
+// SETTINGS ITEM
+// =========================
 
 class _SettingsItem extends StatelessWidget {
   final IconData icon;
@@ -309,11 +483,14 @@ class _SettingsItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
+
       leading: Container(
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.10),
+          color: AppColors.primary.withValues(
+            alpha: 0.10,
+          ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
@@ -322,6 +499,7 @@ class _SettingsItem extends StatelessWidget {
           color: AppColors.primary,
         ),
       ),
+
       title: Text(
         label,
         style: const TextStyle(
@@ -330,6 +508,7 @@ class _SettingsItem extends StatelessWidget {
           color: AppColors.textPrimary,
         ),
       ),
+
       trailing: trailing ??
           (value != null
               ? Text(
