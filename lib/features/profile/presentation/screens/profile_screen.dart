@@ -7,10 +7,8 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
-
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
-
   @override
   Widget build(
       BuildContext context,

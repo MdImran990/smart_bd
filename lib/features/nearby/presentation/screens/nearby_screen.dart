@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../providers/nearby_provider.dart';
 
-class NearbyScreen extends StatefulWidget {
+class NearbyScreen extends ConsumerWidget {
   const NearbyScreen({super.key});
 
-  @override
-  State<NearbyScreen> createState() => _NearbyScreenState();
-}
-
-class _NearbyScreenState extends State<NearbyScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _selectedFilter = 'All';
-
-  final List<String> _filters = [
+  static const List<String> filters = [
     'All',
     'Hospital',
     'Pharmacy',
@@ -24,240 +19,98 @@ class _NearbyScreenState extends State<NearbyScreen> {
     'Fire Service',
   ];
 
-  final List<Map<String, dynamic>> _places = [
-    {
-      'name': 'Dhaka Medical College Hospital',
-      'category': 'Hospital',
-      'distance': '1.2 km',
-      'rating': '4.5',
-      'address': 'Bakshibazar, Dhaka',
-      'icon': Icons.local_hospital_outlined,
-      'open': true,
-    },
-    {
-      'name': 'Popular Pharmacy',
-      'category': 'Pharmacy',
-      'distance': '0.8 km',
-      'rating': '4.3',
-      'address': 'Mirpur, Dhaka',
-      'icon': Icons.local_pharmacy_outlined,
-      'open': true,
-    },
-    {
-      'name': 'Dutch Bangla Bank',
-      'category': 'Bank',
-      'distance': '1.5 km',
-      'rating': '4.1',
-      'address': 'Dhanmondi, Dhaka',
-      'icon': Icons.account_balance_outlined,
-      'open': true,
-    },
-    {
-      'name': 'Dhanmondi Police Station',
-      'category': 'Police',
-      'distance': '2.0 km',
-      'rating': '3.9',
-      'address': 'Dhanmondi, Dhaka',
-      'icon': Icons.local_police_outlined,
-      'open': true,
-    },
-    {
-      'name': 'Square Hospital',
-      'category': 'Hospital',
-      'distance': '2.3 km',
-      'rating': '4.7',
-      'address': 'Panthapath, Dhaka',
-      'icon': Icons.local_hospital_outlined,
-      'open': true,
-    },
-    {
-      'name': 'Apex Pharmacy',
-      'category': 'Pharmacy',
-      'distance': '0.5 km',
-      'rating': '4.0',
-      'address': 'Gulshan, Dhaka',
-      'icon': Icons.local_pharmacy_outlined,
-      'open': false,
-    },
-    {
-      'name': 'Fire Service Station',
-      'category': 'Fire Service',
-      'distance': '3.1 km',
-      'rating': '4.2',
-      'address': 'Tejgaon, Dhaka',
-      'icon': Icons.fire_truck_outlined,
-      'open': true,
-    },
-    {
-      'name': 'Islami Bank',
-      'category': 'Bank',
-      'distance': '1.8 km',
-      'rating': '4.3',
-      'address': 'Motijheel, Dhaka',
-      'icon': Icons.account_balance_outlined,
-      'open': true,
-    },
-  ];
-
-  List<Map<String, dynamic>> get _filteredPlaces {
-    if (_selectedFilter == 'All') return _places;
-    return _places
-        .where((p) => p['category'] == _selectedFilter)
-        .toList();
-  }
-
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final placesAsync = ref.watch(nearbyPlacesProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    final searchQuery = ref.watch(searchQueryProvider);
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.xl,
-                AppSpacing.xl,
-                AppSpacing.md,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Nearby Services',
-                    style: AppTextStyles.headingLarge,
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    '📍 Dhaka, Bangladesh',
-                    style: AppTextStyles.bodyMedium,
-                  ),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Search Bar
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 10,
-                          color: Colors.black.withValues(alpha: 0.05),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: 'Search nearby services...',
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          color: AppColors.textSecondary,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Filter Chips
-            SizedBox(
-              height: 44,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                ),
-                itemCount: _filters.length,
-                separatorBuilder: (_, __) =>
-                const SizedBox(width: AppSpacing.sm),
-                itemBuilder: (context, index) {
-                  final filter = _filters[index];
-                  final isSelected = _selectedFilter == filter;
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedFilter = filter;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 8,
-                            color: Colors.black.withValues(alpha: 0.05),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        filter,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected
-                              ? Colors.white
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.lg),
-
-            // Results Count
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-              ),
-              child: Text(
-                '${_filteredPlaces.length} places found',
-                style: AppTextStyles.bodyMedium,
-              ),
-            ),
+            _buildHeader(context, ref),
 
             const SizedBox(height: AppSpacing.md),
 
-            // Places List
+            // Filters
+            _buildFilters(ref, selectedCategory),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // Places
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                ),
-                itemCount: _filteredPlaces.length,
-                separatorBuilder: (_, __) =>
-                const SizedBox(height: AppSpacing.md),
-                itemBuilder: (context, index) {
-                  final place = _filteredPlaces[index];
-                  return _PlaceCard(place: place);
+              child: placesAsync.when(
+                loading: () =>
+                const Center(child: CircularProgressIndicator()),
+
+                error: (error, stack) =>
+                    Center(child: Text('Error: $error')),
+
+                data: (places) {
+                  final filteredPlaces = places.where((place) {
+                    final matchesCategory =
+                        selectedCategory == 'All' ||
+                            place.category == selectedCategory;
+
+                    final query = searchQuery.toLowerCase();
+
+                    final matchesSearch =
+                        place.name.toLowerCase().contains(query) ||
+                            place.address.toLowerCase().contains(query) ||
+                            place.category.toLowerCase().contains(query);
+
+                    return matchesCategory && matchesSearch;
+                  }).toList();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl,
+                        ),
+                        child: Text(
+                          '${filteredPlaces.length} places found',
+                          style: AppTextStyles.bodyMedium,
+                        ),
+                      ),
+
+                      const SizedBox(height: AppSpacing.md),
+
+                      Expanded(
+                        child: filteredPlaces.isEmpty
+                            ? const Center(
+                          child: Text(
+                            'No places found',
+                            style: AppTextStyles.bodyMedium,
+                          ),
+                        )
+                            : ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.xl,
+                            0,
+                            AppSpacing.xl,
+                            100,
+                          ),
+                          itemCount: filteredPlaces.length,
+                          separatorBuilder: (_, index) =>
+                          const SizedBox(
+                            height: AppSpacing.md,
+                          ),
+                          itemBuilder: (context, index) {
+                            final place = filteredPlaces[index];
+
+                            return _PlaceCard(
+                              place: place,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
                 },
               ),
             ),
@@ -266,150 +119,307 @@ class _NearbyScreenState extends State<NearbyScreen> {
       ),
     );
   }
-}
 
-class _PlaceCard extends StatelessWidget {
-  final Map<String, dynamic> place;
+  // ================= HEADER =================
 
-  const _PlaceCard({required this.place});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            color: Colors.black.withValues(alpha: 0.04),
-          ),
-        ],
+  Widget _buildHeader(
+      BuildContext context,
+      WidgetRef ref,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.xl,
+        AppSpacing.xl,
+        0,
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              place['icon'] as IconData,
-              color: AppColors.primary,
-              size: 24,
-            ),
-          ),
-
-          const SizedBox(width: AppSpacing.md),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  place['name'] as String,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                const SizedBox(height: 3),
-
-                Text(
-                  place['address'] as String,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: (place['open'] as bool)
-                            ? AppColors.success.withValues(alpha: 0.10)
-                            : AppColors.error.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        (place['open'] as bool) ? 'Open' : 'Closed',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: (place['open'] as bool)
-                              ? AppColors.success
-                              : AppColors.error,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    const Icon(
-                      Icons.star_rounded,
-                      size: 13,
-                      color: Color(0xFFF59E0B),
-                    ),
-
-                    const SizedBox(width: 2),
-
-                    Text(
-                      place['rating'] as String,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          // Title + Favorite Button
+          Row(
             children: [
-              Text(
-                place['distance'] as String,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+              const Expanded(
+                child: Text(
+                  'Nearby Services',
+                  style: AppTextStyles.headingLarge,
                 ),
               ),
 
-              const SizedBox(height: 8),
-
               Container(
-                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 10,
+                      color: Colors.black.withValues(alpha: 0.05),
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.directions_rounded,
-                  size: 16,
-                  color: AppColors.primary,
+                child: IconButton(
+                  onPressed: () {
+                    context.push('/nearby/favorites');
+                  },
+                  icon: const Icon(
+                    Icons.favorite_outline_rounded,
+                    color: Colors.red,
+                  ),
                 ),
               ),
             ],
           ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            '📍 Dhaka, Bangladesh',
+            style: AppTextStyles.bodyMedium,
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          // Search Bar
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10,
+                  color: Colors.black.withValues(alpha: 0.05),
+                ),
+              ],
+            ),
+            child: TextField(
+              onChanged: (value) {
+                ref.read(searchQueryProvider.notifier).state = value;
+              },
+              decoration: const InputDecoration(
+                hintText: 'Search nearby services...',
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  color: AppColors.textSecondary,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 14,
+                ),
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  // ================= FILTERS =================
+
+  Widget _buildFilters(
+      WidgetRef ref,
+      String selectedCategory,
+      ) {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+        ),
+        itemCount: filters.length,
+        separatorBuilder: (_, index) =>
+        const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          final filter = filters[index];
+          final isSelected = selectedCategory == filter;
+
+          return GestureDetector(
+            onTap: () {
+              ref.read(selectedCategoryProvider.notifier).state =
+                  filter;
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 8,
+                    color: Colors.black.withValues(alpha: 0.05),
+                  ),
+                ],
+              ),
+              child: Text(
+                filter,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected
+                      ? Colors.white
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ================= PLACE CARD =================
+
+class _PlaceCard extends ConsumerWidget {
+  final dynamic place;
+
+  const _PlaceCard({
+    required this.place,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorites = ref.watch(favoritePlacesProvider);
+
+    final isFavorite = favorites.contains(place.id);
+
+    return GestureDetector(
+      onTap: () {
+        context.push(
+          '/nearby/place-details',
+          extra: place,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 12,
+              color: Colors.black.withValues(alpha: 0.05),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Icon
+            Container(
+              width: 55,
+              height: 55,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                place.icon,
+                color: AppColors.primary,
+              ),
+            ),
+
+            const SizedBox(width: AppSpacing.md),
+
+            // Information
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    place.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Text(
+                    place.address,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.star_rounded,
+                        size: 16,
+                        color: Colors.amber.shade700,
+                      ),
+
+                      const SizedBox(width: 3),
+
+                      Text(
+                        place.rating,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      Text(
+                        place.distance,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Favorite + Status
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    ref
+                        .read(favoritePlacesProvider.notifier)
+                        .toggleFavorite(place.id);
+                  },
+                  icon: Icon(
+                    isFavorite
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
+                    color: isFavorite
+                        ? Colors.red
+                        : AppColors.textSecondary,
+                  ),
+                ),
+
+                Text(
+                  place.isOpen ? 'Open' : 'Closed',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: place.isOpen
+                        ? AppColors.success
+                        : AppColors.error,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
