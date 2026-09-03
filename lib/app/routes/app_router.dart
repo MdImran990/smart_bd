@@ -11,7 +11,7 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/home/presentation/screens/service_detail_screen.dart';
 
 import '../../features/nearby/data/models/nearby_place_model.dart';
-import '../../features/nearby/presentation/screens/favorites_screen.dart';
+import '../../features/nearby/presentation/screens/favorite_places_screen.dart';
 import '../../features/nearby/presentation/screens/nearby_screen.dart';
 import '../../features/nearby/presentation/screens/place_details_screen.dart';
 
@@ -41,14 +41,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isOnAuthRoute =
       authRoutes.contains(state.matchedLocation);
 
-      if (isInitial) return null;
+      // Auth এখনও check হচ্ছে
+      if (isInitial) {
+        return null;
+      }
 
-      // User login না থাকলে
+      // Login না থাকলে
       if (!isAuthenticated && !isOnAuthRoute) {
         return '/login';
       }
 
-      // User login থাকা অবস্থায় Login page এ গেলে
+      // Login থাকলে আবার login page এ যেতে পারবে না
       if (isAuthenticated && isOnAuthRoute) {
         return '/home';
       }
@@ -57,25 +60,36 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
-      // ================= AUTH =================
+
+      // =========================
+      // AUTH ROUTES
+      // =========================
 
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) {
+          return const LoginScreen();
+        },
       ),
 
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        builder: (context, state) {
+          return const RegisterScreen();
+        },
       ),
 
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) =>
-        const ForgotPasswordScreen(),
+        builder: (context, state) {
+          return const ForgotPasswordScreen();
+        },
       ),
 
-      // ================= MAIN APP =================
+
+      // =========================
+      // MAIN APP
+      // =========================
 
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -85,47 +99,65 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
 
         branches: [
-          // ================= HOME =================
+
+          // =========================
+          // HOME
+          // =========================
 
           StatefulShellBranch(
             routes: [
+
               GoRoute(
                 path: '/home',
-                builder: (context, state) =>
-                const HomeScreen(),
+
+                builder: (context, state) {
+                  return const HomeScreen();
+                },
 
                 routes: [
+
                   GoRoute(
                     path: 'service/:id',
+
                     builder: (context, state) {
-                      final extra =
+                      final service =
                       state.extra as ServiceModel;
 
                       return ServiceDetailScreen(
-                        serviceId: extra.id,
-                        title: extra.title,
-                        icon: extra.icon,
+                        serviceId: service.id,
+                        title: service.title,
+                        icon: service.icon,
                       );
                     },
                   ),
+
                 ],
               ),
+
             ],
           ),
 
-          // ================= NEARBY =================
+
+          // =========================
+          // NEARBY
+          // =========================
 
           StatefulShellBranch(
             routes: [
+
               GoRoute(
                 path: '/nearby',
-                builder: (context, state) =>
-                const NearbyScreen(),
+
+                builder: (context, state) {
+                  return const NearbyScreen();
+                },
 
                 routes: [
+
                   // Place Details
                   GoRoute(
                     path: 'place-details',
+
                     builder: (context, state) {
                       final place =
                       state.extra as NearbyPlaceModel;
@@ -136,28 +168,41 @@ final routerProvider = Provider<GoRouter>((ref) {
                     },
                   ),
 
+
                   // Favorites
                   GoRoute(
                     path: 'favorites',
-                    builder: (context, state) =>
-                    const FavoritesScreen(),
+
+                    builder: (context, state) {
+                      return const FavoritePlacesScreen();
+                    },
                   ),
+
                 ],
               ),
+
             ],
           ),
 
-          // ================= PROFILE =================
+
+          // =========================
+          // PROFILE
+          // =========================
 
           StatefulShellBranch(
             routes: [
+
               GoRoute(
                 path: '/profile',
-                builder: (context, state) =>
-                const ProfileScreen(),
+
+                builder: (context, state) {
+                  return const ProfileScreen();
+                },
               ),
+
             ],
           ),
+
         ],
       ),
     ],

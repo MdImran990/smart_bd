@@ -4,523 +4,277 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_text_styles.dart';
-
 import '../../../auth/presentation/providers/auth_provider.dart';
+
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
   @override
-  Widget build(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          children: [
+            const SizedBox(height: AppSpacing.md),
+
+            // ================= HEADER =================
+
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary.withValues(
+                        alpha: 0.15,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      size: 55,
+                      color: AppColors.primary,
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  Text(
+                    user?.name ?? 'User',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Text(
+                    user?.email ?? '',
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.xxl),
+
+            // ================= MENU =================
+
+            _ProfileMenuCard(
+              children: [
+                _ProfileMenuItem(
+                  icon: Icons.favorite_outline_rounded,
+                  title: 'My Favorites',
+                  onTap: () {
+                    context.push('/nearby/favorites');
+                  },
+                ),
+
+                _ProfileMenuItem(
+                  icon: Icons.notifications_none_rounded,
+                  title: 'Notifications',
+                  onTap: () {
+                    context.push('/notifications');
+                  },
+                ),
+
+                _ProfileMenuItem(
+                  icon: Icons.settings_outlined,
+                  title: 'Settings',
+                  onTap: () {
+                    context.push('/settings');
+                  },
+                ),
+
+                _ProfileMenuItem(
+                  icon: Icons.help_outline_rounded,
+                  title: 'Help & Support',
+                  onTap: () {
+                    _showSupportDialog(context);
+                  },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // ================= LOGOUT =================
+
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: ListTile(
+                leading: const Icon(
+                  Icons.logout_rounded,
+                  color: AppColors.error,
+                ),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.error,
+                ),
+                onTap: () {
+                  _showLogoutDialog(context, ref);
+                },
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.xxl),
+
+            Center(
+              child: Text(
+                'Smart BD v1.0.0',
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.5),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(
       BuildContext context,
       WidgetRef ref,
       ) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.xl,
-            AppSpacing.xl,
-            AppSpacing.xl,
-            100,
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text(
+            'Are you sure you want to logout?',
           ),
-          child: Column(
-            children: [
-
-              // Profile Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.xxl),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF2563EB),
-                      Color(0xFF1D4ED8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.md,
-                    ),
-
-                    const Text(
-                      'Imran Hossain',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      '📍 Dhaka, Bangladesh',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white.withValues(
-                          alpha: 0.8,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
-
-                    Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _StatItem(
-                          label: 'Saved',
-                          value: '12',
-                        ),
-
-                        const _StatDivider(),
-
-                        _StatItem(
-                          label: 'Visited',
-                          value: '48',
-                        ),
-
-                        const _StatDivider(),
-
-                        _StatItem(
-                          label: 'Reviews',
-                          value: '7',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(
-                height: AppSpacing.xxl,
-              ),
-
-              // Account Section
-              const _SectionTitle(
-                title: 'Account',
-              ),
-
-              const SizedBox(
-                height: AppSpacing.md,
-              ),
-
-              _SettingsCard(
-                items: [
-                  _SettingsItem(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Edit Profile',
-                    onTap: () {},
-                  ),
-
-                  _SettingsItem(
-                    icon: Icons.location_on_outlined,
-                    label: 'My Location',
-                    onTap: () {},
-                  ),
-
-                  _SettingsItem(
-                    icon: Icons.notifications_none_rounded,
-                    label: 'Notifications',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(
-                height: AppSpacing.lg,
-              ),
-
-              // Preferences
-              const _SectionTitle(
-                title: 'Preferences',
-              ),
-
-              const SizedBox(
-                height: AppSpacing.md,
-              ),
-
-              _SettingsCard(
-                items: [
-                  _SettingsItem(
-                    icon: Icons.dark_mode_outlined,
-                    label: 'Dark Mode',
-                    onTap: () {},
-                    trailing: Switch(
-                      value: false,
-                      onChanged: (_) {},
-                    ),
-                  ),
-
-                  _SettingsItem(
-                    icon: Icons.language_outlined,
-                    label: 'Language',
-                    onTap: () {},
-                    value: 'English',
-                  ),
-                ],
-              ),
-
-              const SizedBox(
-                height: AppSpacing.lg,
-              ),
-
-              // Support
-              const _SectionTitle(
-                title: 'Support',
-              ),
-
-              const SizedBox(
-                height: AppSpacing.md,
-              ),
-
-              _SettingsCard(
-                items: [
-                  _SettingsItem(
-                    icon: Icons.help_outline_rounded,
-                    label: 'Help & Support',
-                    onTap: () {},
-                  ),
-
-                  _SettingsItem(
-                    icon: Icons.privacy_tip_outlined,
-                    label: 'Privacy Policy',
-                    onTap: () {},
-                  ),
-
-                  _SettingsItem(
-                    icon: Icons.info_outline_rounded,
-                    label: 'About Smart BD',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(
-                height: AppSpacing.xxl,
-              ),
-
-              // =========================
-              // LOGOUT BUTTON
-              // =========================
-
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    // Show confirmation dialog
-                    final shouldLogout =
-                    await showDialog<bool>(
-                      context: context,
-                      builder: (dialogContext) {
-                        return AlertDialog(
-                          title: const Text(
-                            'Log Out',
-                          ),
-                          content: const Text(
-                            'Are you sure you want to log out?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(
-                                  dialogContext,
-                                  false,
-                                );
-                              },
-                              child: const Text(
-                                'Cancel',
-                              ),
-                            ),
-
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(
-                                  dialogContext,
-                                  true,
-                                );
-                              },
-                              child: const Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  color: AppColors.error,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-
-                    if (shouldLogout != true) {
-                      return;
-                    }
-
-                    // Logout from Riverpod
-                    await ref
-                        .read(authProvider.notifier)
-                        .logout();
-
-                    // Go to Login Page
-                    if (context.mounted) {
-                      context.go('/login');
-                    }
-                  },
-
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                    color: AppColors.error,
-                  ),
-
-                  label: const Text(
-                    'Log Out',
-                    style: TextStyle(
-                      color: AppColors.error,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-                    side: const BorderSide(
-                      color: AppColors.error,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// =========================
-// STAT ITEM
-// =========================
-
-class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _StatItem({
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-
-        const SizedBox(height: 2),
-
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.white.withValues(
-              alpha: 0.8,
+          actions: [
+            TextButton(
+              onPressed: () {
+                dialogContext.pop();
+              },
+              child: const Text('Cancel'),
             ),
+
+            ElevatedButton(
+              onPressed: () async {
+                dialogContext.pop();
+
+                await ref
+                    .read(authProvider.notifier)
+                    .logout();
+
+                if (context.mounted) {
+                  context.go('/login');
+                }
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSupportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Help & Support'),
+          content: const Text(
+            'For support, please contact Smart BD support team.',
           ),
-        ),
-      ],
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
-// =========================
-// STAT DIVIDER
-// =========================
+class _ProfileMenuCard extends StatelessWidget {
+  final List<Widget> children;
 
-class _StatDivider extends StatelessWidget {
-  const _StatDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 40,
-      color: Colors.white.withValues(
-        alpha: 0.3,
-      ),
-    );
-  }
-}
-
-// =========================
-// SECTION TITLE
-// =========================
-
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        title,
-        style: AppTextStyles.headingMedium,
-      ),
-    );
-  }
-}
-
-// =========================
-// SETTINGS CARD
-// =========================
-
-class _SettingsCard extends StatelessWidget {
-  final List<_SettingsItem> items;
-
-  const _SettingsCard({
-    required this.items,
+  const _ProfileMenuCard({
+    required this.children,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            color: Colors.black.withValues(
-              alpha: 0.04,
-            ),
-          ),
-        ],
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
-        children: items
-            .asMap()
-            .entries
-            .map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-
-          return Column(
-            children: [
-              item,
-
-              if (index < items.length - 1)
-                const Divider(
-                  height: 1,
-                  indent: 56,
-                ),
-            ],
-          );
-        }).toList(),
+        children: children,
       ),
     );
   }
 }
 
-// =========================
-// SETTINGS ITEM
-// =========================
-
-class _SettingsItem extends StatelessWidget {
+class _ProfileMenuItem extends StatelessWidget {
   final IconData icon;
-  final String label;
+  final String title;
   final VoidCallback onTap;
-  final String? value;
-  final Widget? trailing;
 
-  const _SettingsItem({
+  const _ProfileMenuItem({
     required this.icon,
-    required this.label,
+    required this.title,
     required this.onTap,
-    this.value,
-    this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: onTap,
-
       leading: Container(
-        width: 36,
-        height: 36,
+        width: 42,
+        height: 42,
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(
-            alpha: 0.10,
-          ),
-          borderRadius: BorderRadius.circular(10),
+          color: AppColors.primary.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(
           icon,
-          size: 20,
           color: AppColors.primary,
         ),
       ),
-
       title: Text(
-        label,
+        title,
         style: const TextStyle(
-          fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
         ),
       ),
-
-      trailing: trailing ??
-          (value != null
-              ? Text(
-            value!,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
-          )
-              : const Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 14,
-            color: AppColors.textSecondary,
-          )),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+      ),
+      onTap: onTap,
     );
   }
 }
