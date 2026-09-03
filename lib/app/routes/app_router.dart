@@ -5,6 +5,9 @@ import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/emergency/data/models/emergency_service_model.dart';
+import '../../features/emergency/presentation/screens/emergency_details_screen.dart';
+import '../../features/emergency/presentation/screens/emergency_screen.dart';
 import '../../features/home/data/models/service_model.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/home/presentation/screens/service_detail_screen.dart';
@@ -75,6 +78,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/weather',
         builder: (context, state) => const WeatherDetailScreen(),
+      ),
+
+      // Emergency ✅
+      GoRoute(
+        path: '/emergency',
+        builder: (context, state) => const EmergencyScreen(),
+        routes: [
+          GoRoute(
+            path: 'details',
+            builder: (context, state) {
+              final service = state.extra as EmergencyServiceModel;
+              return EmergencyDetailsScreen(service: service);
+            },
+          ),
+        ],
       ),
 
       // Main Shell

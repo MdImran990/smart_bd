@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../data/models/weather_model.dart';
 import '../providers/weather_provider.dart';
 
 class WeatherDetailScreen extends ConsumerWidget {
