@@ -4,7 +4,6 @@ import '../models/weather_model.dart';
 
 class WeatherRemoteDatasource {
   final Dio _dio;
-
   static const String _baseUrl =
       'https://api.openweathermap.org/data/2.5';
 
