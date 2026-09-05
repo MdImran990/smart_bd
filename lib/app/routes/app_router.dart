@@ -5,7 +5,6 @@ import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
-
 import '../../features/emergency/data/models/emergency_service_model.dart';
 import '../../features/emergency/presentation/screens/emergency_details_screen.dart';
 import '../../features/emergency/presentation/screens/emergency_screen.dart';

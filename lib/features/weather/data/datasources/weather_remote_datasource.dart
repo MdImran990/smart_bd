@@ -8,8 +8,7 @@ class WeatherRemoteDatasource {
   static const String _baseUrl =
       'https://api.openweathermap.org/data/2.5';
 
-  // নিজের নতুন API Key এখানে বসাবে
-  static const String _apiKey = 'YOUR_OPENWEATHER_API_KEY';
+  static const String _apiKey = '3c4d633e38eb836707ad93bb8c4bb775';
 
   WeatherRemoteDatasource()
       : _dio = Dio(
