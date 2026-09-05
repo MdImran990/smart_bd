@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/profile_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -12,7 +15,20 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
-    final user = authState.user;
+    final authUser = authState.user;
+
+    final profile = ref.watch(profileProvider);
+
+    final name = profile.name.isNotEmpty
+        ? profile.name
+        : authUser?.name ?? 'User';
+
+    final email = profile.email.isNotEmpty
+        ? profile.email
+        : authUser?.email ?? '';
+
+    final hasImage = profile.imagePath != null &&
+        File(profile.imagePath!).existsSync();
 
     return Scaffold(
       body: SafeArea(
@@ -21,31 +37,68 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: AppSpacing.md),
 
-            // ================= HEADER =================
+            // PROFILE HEADER
 
             Center(
               child: Column(
                 children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.primary.withValues(
-                        alpha: 0.15,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.person_rounded,
-                      size: 55,
-                      color: AppColors.primary,
+                  GestureDetector(
+                    onTap: () {
+                      context.push('/edit-profile');
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 110,
+                          height: 110,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary.withValues(
+                              alpha: 0.15,
+                            ),
+                            image: hasImage
+                                ? DecorationImage(
+                              image: FileImage(
+                                File(profile.imagePath!),
+                              ),
+                              fit: BoxFit.cover,
+                            )
+                                : null,
+                          ),
+                          child: hasImage
+                              ? null
+                              : const Icon(
+                            Icons.person_rounded,
+                            size: 60,
+                            color: AppColors.primary,
+                          ),
+                        ),
+
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.edit_rounded,
+                              size: 19,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
                   const SizedBox(height: AppSpacing.md),
 
                   Text(
-                    user?.name ?? 'User',
+                    name,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -55,10 +108,20 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
 
                   Text(
-                    user?.email ?? '',
+                    email,
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                     ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      context.push('/edit-profile');
+                    },
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('Edit Profile'),
                   ),
                 ],
               ),
@@ -66,7 +129,7 @@ class ProfileScreen extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.xxl),
 
-            // ================= MENU =================
+            // MENU
 
             _ProfileMenuCard(
               children: [
@@ -106,7 +169,7 @@ class ProfileScreen extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.xl),
 
-            // ================= LOGOUT =================
+            // LOGOUT
 
             Container(
               decoration: BoxDecoration(
@@ -198,7 +261,7 @@ class ProfileScreen extends ConsumerWidget {
   void _showSupportDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Help & Support'),
           content: const Text(
@@ -207,7 +270,7 @@ class ProfileScreen extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () {
-                context.pop();
+                dialogContext.pop();
               },
               child: const Text('OK'),
             ),
